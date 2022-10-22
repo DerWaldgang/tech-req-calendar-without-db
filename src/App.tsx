@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Layout } from "antd";
+import React, { useEffect } from "react";
+import AppRouter from "./components/AppRouter";
+import Navbar from "./components/Navbar";
+import "./App.css";
+import { useDispatch } from "react-redux";
+import { auth, logIn } from "./store/reducers/authSlice";
+import { reAddEvents } from "./store/reducers/eventsSlice";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (localStorage.getItem("isAuth")) {
+      dispatch(auth({}));
+      dispatch(
+        logIn({ username: localStorage.getItem("username"), password: "12345" })
+      );
+      if (localStorage.getItem("events") !== null) {
+        const eventsData = JSON.parse(localStorage.getItem("events") || "");
+        dispatch(reAddEvents(eventsData));
+      }
+    }
+  }, [dispatch]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout>
+      <Navbar />
+      <Layout.Content>
+        <AppRouter />
+      </Layout.Content>
+    </Layout>
   );
 }
 
